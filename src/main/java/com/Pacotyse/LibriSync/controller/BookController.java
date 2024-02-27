@@ -5,6 +5,8 @@ import com.Pacotyse.LibriSync.repository.BookRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -41,5 +43,10 @@ public class BookController {
                 .collect(Collectors.toList());
 
         return CollectionModel.of(books, linkTo(methodOn(BookController.class).all()).withSelfRel());
+    }
+
+    @PostMapping("/books")
+    Book newBook(@RequestBody Book newBook) {
+        return repository.save(newBook);
     }
 }
