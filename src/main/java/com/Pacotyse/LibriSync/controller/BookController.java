@@ -4,10 +4,7 @@ import com.Pacotyse.LibriSync.model.Book;
 import com.Pacotyse.LibriSync.repository.BookRepository;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,8 +42,14 @@ public class BookController {
         return CollectionModel.of(books, linkTo(methodOn(BookController.class).all()).withSelfRel());
     }
 
+    /**
+     * Saves a new book.
+     *
+     * @param newBook The book to be saved. It should be passed in the request body.
+     * @return The saved book.
+     */
     @PostMapping("/books")
-    Book newBook(@RequestBody Book newBook) {
+    public Book newBook(@RequestBody Book newBook) {
         return repository.save(newBook);
     }
 }
