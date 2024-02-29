@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Represents a book in the library management system.
@@ -18,12 +19,14 @@ public class Book {
     /**
      * The title of the book.
      */
-    private @Column(name = "title") String title;
+    private @NotNull
+    @Column(name = "title") String title;
 
     /**
      * The author of the book.
      */
-    private @Column(name = "author") String author;
+    private @NotNull
+    @Column(name = "author") String author;
 
     /**
      * Default constructor.

@@ -3,6 +3,7 @@ package com.Pacotyse.LibriSync.controller;
 import com.Pacotyse.LibriSync.exception.BookNotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
 import com.Pacotyse.LibriSync.repository.BookRepository;
+import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,7 @@ public class BookController {
      * @return The saved book.
      */
     @PostMapping("/books")
-    public Book newBook(@RequestBody Book newBook) {
+    public Book newBook(@Valid @RequestBody Book newBook) {
         return repository.save(newBook);
     }
 
