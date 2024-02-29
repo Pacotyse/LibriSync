@@ -37,6 +37,7 @@ public class BookController {
     CollectionModel<EntityModel<Book>> all() {
         List<EntityModel<Book>> books = repository.findAll().stream()
                 .map(book -> EntityModel.of(book,
+                        linkTo(methodOn(BookController.class).one(book.getId())).withSelfRel(),
                         linkTo(methodOn(BookController.class).all()).withRel("books")))
                 .collect(Collectors.toList());
 
