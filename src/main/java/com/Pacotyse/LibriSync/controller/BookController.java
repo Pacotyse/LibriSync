@@ -1,5 +1,6 @@
 package com.Pacotyse.LibriSync.controller;
 
+import com.Pacotyse.LibriSync.exception.BookNotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
 import com.Pacotyse.LibriSync.repository.BookRepository;
 import org.springframework.hateoas.CollectionModel;
@@ -51,5 +52,21 @@ public class BookController {
     @PostMapping("/books")
     public Book newBook(@RequestBody Book newBook) {
         return repository.save(newBook);
+    }
+
+    /**
+     * Retrieves a single book by its id and returns it as an entity model with HATEOAS links.
+     * @param id The id of the book to be retrieved.
+     * @return The book with the specified id as an entity model with HATEOAS links.
+     */
+    @GetMapping("/books/{id}")
+    EntityModel<Book> one(@PathVariable Long id) {
+        Book book = repository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+
+        return EntityModel.of(book,
+                linkTo(methodOn(BookController.class).one(id)).withSelfRel(),
+                linkTo(methodOn(BookController.class).all()).withRel("books"));
+
     }
 }
