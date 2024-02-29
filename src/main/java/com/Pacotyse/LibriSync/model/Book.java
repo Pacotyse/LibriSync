@@ -2,7 +2,6 @@ package com.Pacotyse.LibriSync.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,8 +12,8 @@ import jakarta.validation.constraints.NotNull;
 public class Book {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private @NotNull
+    @Column(name = "isbn") Long isbn;
 
     /**
      * The title of the book.
@@ -29,26 +28,29 @@ public class Book {
     @Column(name = "author") String author;
 
     /**
+     * The editor of the book.
+     */
+    private
+    @Column(name = "editor") String editor;
+
+    /**
      * Default constructor.
      */
     public Book() {}
 
-    /**
-     * Constructs a book with the given title and author.
-     * @param title The title of the book.
-     * @param author The author of the book.
-     */
-    public Book(String title, String author) {
+    public Book(Long isbn, String title, String author, String editor) {
+        this.isbn = isbn;
         this.title = title;
         this.author = author;
+        this.editor = editor;
     }
 
     /**
      * Gets the id of the book.
      * @return The id of the book.
      */
-    public Long getId() {
-        return id;
+    public Long getIsbn() {
+        return isbn;
     }
 
     /**
@@ -81,5 +83,13 @@ public class Book {
      */
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getEditor() {
+        return editor;
+    }
+
+    public void setEditor(String editor) {
+        this.editor = editor;
     }
 }
