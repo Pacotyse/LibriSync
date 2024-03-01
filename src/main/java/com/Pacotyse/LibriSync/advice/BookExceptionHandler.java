@@ -1,5 +1,6 @@
 package com.Pacotyse.LibriSync.advice;
 
+import com.Pacotyse.LibriSync.exception.BookFoundException;
 import com.Pacotyse.LibriSync.exception.BookNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,6 +23,18 @@ public class BookExceptionHandler {
     @ExceptionHandler(BookNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     String bookNotFoundHandler(BookNotFoundException ex) {
+        return ex.getMessage();
+    }
+
+    /**
+     * Handles BookFoundException and returns a 400 BAD_REQUEST response.
+     * @param ex The BookFoundException instance.
+     * @return A string representing the error message.
+     */
+    @ResponseBody
+    @ExceptionHandler(BookFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String bookFoundHandler(BookFoundException ex) {
         return ex.getMessage();
     }
 }

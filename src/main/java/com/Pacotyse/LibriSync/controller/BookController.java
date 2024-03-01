@@ -1,5 +1,6 @@
 package com.Pacotyse.LibriSync.controller;
 
+import com.Pacotyse.LibriSync.exception.BookFoundException;
 import com.Pacotyse.LibriSync.exception.BookNotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
 import com.Pacotyse.LibriSync.repository.BookRepository;
@@ -54,7 +55,7 @@ public class BookController {
     @PostMapping("/books")
     public Book newBook(@Valid @RequestBody Book newBook) {
         if (repository.existsById(newBook.getIsbn())) {
-            throw new IllegalArgumentException("A book with the same ISBN already exists.");
+            throw new BookFoundException(newBook.getIsbn());
         } else {
             return repository.save(newBook);
         }
