@@ -90,6 +90,7 @@ public class BookController {
                     book.setTitle(newBook.getTitle());
                     book.setAuthor(newBook.getAuthor());
                     book.setEditor(newBook.getEditor());
+                    book.setStock(newBook.getStock());
                     return repository.save(book);
                 })
                 .orElseGet(() -> {
