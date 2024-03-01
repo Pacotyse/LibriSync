@@ -53,8 +53,13 @@ public class BookController {
      */
     @PostMapping("/books")
     public Book newBook(@Valid @RequestBody Book newBook) {
-        return repository.save(newBook);
+        if (repository.existsById(newBook.getIsbn())) {
+            throw new IllegalArgumentException("A book with the same ISBN already exists.");
+        } else {
+            return repository.save(newBook);
+        }
     }
+
 
     /**
      * Retrieves a single book by its id and returns it as an entity model with HATEOAS links.
