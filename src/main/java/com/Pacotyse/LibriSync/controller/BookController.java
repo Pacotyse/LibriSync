@@ -60,7 +60,6 @@ public class BookController {
         }
     }
 
-
     /**
      * Retrieves a single book by its id and returns it as an entity model with HATEOAS links.
      * @param id The id of the book to be retrieved.
@@ -75,6 +74,28 @@ public class BookController {
                 linkTo(methodOn(BookController.class).one(id)).withSelfRel(),
                 linkTo(methodOn(BookController.class).all()).withRel("books"));
 
+    }
+
+    /**
+     * Replaces the book with the specified ID with the provided new book details.
+     *
+     * @param newBook The new details of the book.
+     * @param id      The ID of the book to be replaced.
+     * @return The updated book.
+     */
+    @PutMapping("/books/{id}")
+    Book replaceBook(@RequestBody Book newBook, @PathVariable Long id) {
+        return repository.findById(id)
+                .map(book -> {
+                    book.setTitle(newBook.getTitle());
+                    book.setAuthor(newBook.getAuthor());
+                    book.setEditor(newBook.getEditor());
+                    return repository.save(book);
+                })
+                .orElseGet(() -> {
+                    newBook.setIsbn(id);
+                    return repository.save(newBook);
+                });
     }
 
     /**

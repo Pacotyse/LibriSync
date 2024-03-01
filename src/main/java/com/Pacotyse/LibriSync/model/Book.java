@@ -53,6 +53,10 @@ public class Book {
         return isbn;
     }
 
+    public void setIsbn(Long isbn) {
+        this.isbn = isbn;
+    }
+
     /**
      * Gets the title of the book.
      * @return The title of the book.
