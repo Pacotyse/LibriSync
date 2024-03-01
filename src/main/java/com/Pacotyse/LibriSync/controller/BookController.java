@@ -76,4 +76,14 @@ public class BookController {
                 linkTo(methodOn(BookController.class).all()).withRel("books"));
 
     }
+
+    /**
+     * Deletes a book with the specified ID.
+     *
+     * @param id The ID of the book to be deleted.
+     */
+    @DeleteMapping("/books/{id}")
+    void deleteBook(@PathVariable Long id) {
+        repository.deleteById(id);
+    }
 }
