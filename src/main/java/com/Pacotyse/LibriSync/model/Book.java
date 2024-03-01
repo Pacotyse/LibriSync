@@ -30,14 +30,27 @@ public class Book {
     /**
      * The editor of the book.
      */
-    private
+    private @NotNull
     @Column(name = "editor") String editor;
+
+    /**
+     * The stock quantity of the book.
+     */
+    private @NotNull
+    @Column(name = "stock") int stock = 1;
 
     /**
      * Default constructor.
      */
     public Book() {}
 
+    /**
+     * Constructs a book with the specified details.
+     * @param isbn The ISBN of the book.
+     * @param title The title of the book.
+     * @param author The author of the book.
+     * @param editor The editor of the book.
+     */
     public Book(Long isbn, String title, String author, String editor) {
         this.isbn = isbn;
         this.title = title;
@@ -46,13 +59,17 @@ public class Book {
     }
 
     /**
-     * Gets the id of the book.
-     * @return The id of the book.
+     * Gets the ISBN of the book.
+     * @return The ISBN of the book.
      */
     public Long getIsbn() {
         return isbn;
     }
 
+    /**
+     * Sets the ISBN of the book.
+     * @param isbn The new ISBN of the book.
+     */
     public void setIsbn(Long isbn) {
         this.isbn = isbn;
     }
@@ -89,11 +106,35 @@ public class Book {
         this.author = author;
     }
 
+    /**
+     * Gets the editor of the book.
+     * @return The editor of the book.
+     */
     public String getEditor() {
         return editor;
     }
 
+    /**
+     * Sets the editor of the book.
+     * @param editor The new editor of the book.
+     */
     public void setEditor(String editor) {
         this.editor = editor;
+    }
+
+    /**
+     * Gets the stock quantity of the book.
+     * @return The stock quantity of the book.
+     */
+    public int getStock() {
+        return stock;
+    }
+
+    /**
+     * Sets the stock quantity of the book.
+     * @param stock The new stock quantity of the book.
+     */
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 }
