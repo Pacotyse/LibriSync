@@ -54,6 +54,10 @@ public class MemberController {
      */
     @PostMapping("/members")
     public Member newUser(@Valid @RequestBody Member newMember) {
+        Member existingMember = repository.findByEmail(newMember.getEmail());
+        if (existingMember != null) {
+            throw new DuplicateException();
+        }
         return repository.save(newMember);
     }
 
