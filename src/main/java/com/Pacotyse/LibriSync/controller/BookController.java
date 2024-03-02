@@ -1,6 +1,7 @@
 package com.Pacotyse.LibriSync.controller;
 
 import com.Pacotyse.LibriSync.exception.BookFoundException;
+import com.Pacotyse.LibriSync.exception.DuplicateException;
 import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
 import com.Pacotyse.LibriSync.repository.BookRepository;
@@ -55,7 +56,7 @@ public class BookController {
     @PostMapping("/books")
     public Book newBook(@Valid @RequestBody Book newBook) {
         if (repository.existsById(newBook.getIsbn())) {
-            throw new BookFoundException(newBook.getIsbn());
+            throw new DuplicateException();
         } else {
             return repository.save(newBook);
         }
