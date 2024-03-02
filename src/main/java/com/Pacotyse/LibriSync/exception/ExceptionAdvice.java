@@ -14,4 +14,11 @@ public class ExceptionAdvice {
     String NotFoundHandler(NotFoundException ex) {
         return ex.getMessage();
     }
+
+    @ResponseBody
+    @ExceptionHandler(DuplicateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    String DuplicateHandler(DuplicateException ex) {
+        return ex.getMessage();
+    }
 }

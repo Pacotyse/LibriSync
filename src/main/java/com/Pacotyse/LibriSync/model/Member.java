@@ -1,9 +1,6 @@
 package com.Pacotyse.LibriSync.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
@@ -38,7 +35,8 @@ public class Member {
      * The email address of the member.
      */
     @Email
-    @Column(name = "email")
+    @NotNull
+    @Column(name = "email", unique = true)
     private String email;
 
     /**

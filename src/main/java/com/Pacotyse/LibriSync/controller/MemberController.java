@@ -1,5 +1,6 @@
 package com.Pacotyse.LibriSync.controller;
 
+import com.Pacotyse.LibriSync.exception.DuplicateException;
 import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Member;
 import com.Pacotyse.LibriSync.repository.MemberRepository;
@@ -9,6 +10,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
