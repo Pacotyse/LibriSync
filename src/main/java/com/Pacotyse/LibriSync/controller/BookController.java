@@ -1,7 +1,7 @@
 package com.Pacotyse.LibriSync.controller;
 
 import com.Pacotyse.LibriSync.exception.BookFoundException;
-import com.Pacotyse.LibriSync.exception.BookNotFoundException;
+import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
 import com.Pacotyse.LibriSync.repository.BookRepository;
 import jakarta.validation.Valid;
@@ -69,7 +69,7 @@ public class BookController {
     @GetMapping("/books/{id}")
     EntityModel<Book> one(@PathVariable Long id) {
         Book book = repository.findById(id)
-                .orElseThrow(() -> new BookNotFoundException(id));
+                .orElseThrow(NotFoundException::new);
 
         return EntityModel.of(book,
                 linkTo(methodOn(BookController.class).one(id)).withSelfRel(),

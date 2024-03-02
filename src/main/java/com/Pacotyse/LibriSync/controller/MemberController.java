@@ -1,8 +1,8 @@
 package com.Pacotyse.LibriSync.controller;
 
+import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Member;
 import com.Pacotyse.LibriSync.repository.MemberRepository;
-import com.Pacotyse.LibriSync.exception.MemberNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -59,12 +59,12 @@ public class MemberController {
      * Retrieves a specific member by ID.
      * @param id The ID of the member to retrieve.
      * @return The member resource.
-     * @throws MemberNotFoundException if the member with the specified ID is not found.
+     * @throws NotFoundException if the member with the specified ID is not found.
      */
     @GetMapping("/members/{id}")
     EntityModel<Member> one(@PathVariable Long id) {
         Member member = repository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException(id));
+                .orElseThrow(NotFoundException::new);
 
         return EntityModel.of(member,
                 linkTo(methodOn(MemberController.class).one(id)).withSelfRel(),
