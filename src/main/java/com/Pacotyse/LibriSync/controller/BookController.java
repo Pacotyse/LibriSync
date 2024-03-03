@@ -1,6 +1,5 @@
 package com.Pacotyse.LibriSync.controller;
 
-import com.Pacotyse.LibriSync.exception.BookFoundException;
 import com.Pacotyse.LibriSync.exception.DuplicateException;
 import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
