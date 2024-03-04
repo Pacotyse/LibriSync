@@ -1,16 +1,16 @@
 package com.Pacotyse.LibriSync.controller;
 
-import com.Pacotyse.LibriSync.exception.DuplicateException;
-import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Member;
-import com.Pacotyse.LibriSync.repository.MemberRepository;
+import com.Pacotyse.LibriSync.service.MemberService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -20,90 +20,75 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * Controller class for managing members in the library system.
  */
 @RestController
+@RequestMapping("/members")
 public class MemberController {
 
-    private final MemberRepository repository;
+    @Autowired
+    private MemberService memberService;
 
     /**
-     * Constructor for MemberController.
-     * @param repository The repository for managing members.
+     * Registers a new member.
+     *
+     * @param newMember The member to register.
+     * @return The created member.
      */
-    MemberController(MemberRepository repository) {
-        this.repository = repository;
+    @PostMapping("register")
+    ResponseEntity<Member> registerMember(@Valid @RequestBody Member newMember) {
+        memberService.registerMember(newMember);
+        return new ResponseEntity<>(newMember, HttpStatus.CREATED);
     }
 
     /**
      * Retrieves all members.
+     *
      * @return A collection of member resources.
      */
-    @GetMapping("/members")
-    CollectionModel<EntityModel<Member>> all() {
-        List<EntityModel<Member>> members = repository.findAll().stream()
+    @GetMapping("")
+    CollectionModel<EntityModel<Member>> getAllMembers() {
+        List<EntityModel<Member>> members = memberService.getAllMembers().stream()
                 .map(member -> EntityModel.of(member,
-                        linkTo(methodOn(MemberController.class).one(member.getId())).withSelfRel(),
-                        linkTo(methodOn(MemberController.class).all()).withRel("members")))
+                        linkTo(methodOn(MemberController.class).getOneMember(member.getId())).withSelfRel(),
+                        linkTo(methodOn(MemberController.class).getAllMembers()).withRel("members")))
                 .collect(Collectors.toList());
 
-        return CollectionModel.of(members, linkTo(methodOn(MemberController.class).all()).withSelfRel());
-    }
-
-    /**
-     * Creates a new member.
-     * @param newMember The member to be created.
-     * @return The created member.
-     */
-    @PostMapping("/members")
-    public Member newUser(@Valid @RequestBody Member newMember) {
-        Member existingMember = repository.findByEmail(newMember.getEmail());
-        if (existingMember != null) {
-            throw new DuplicateException();
-        }
-        return repository.save(newMember);
+        return CollectionModel.of(members, linkTo(methodOn(MemberController.class).getAllMembers()).withSelfRel());
     }
 
     /**
      * Retrieves a specific member by ID.
+     *
      * @param id The ID of the member to retrieve.
-     * @return The member resource.
-     * @throws NotFoundException if the member with the specified ID is not found.
+     * @return The member with the specified ID.
      */
-    @GetMapping("/members/{id}")
-    EntityModel<Member> one(@PathVariable Long id) {
-        Member member = repository.findById(id)
-                .orElseThrow(NotFoundException::new);
-
-        return EntityModel.of(member,
-                linkTo(methodOn(MemberController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(MemberController.class).all()).withRel("members"));
+    @GetMapping("/{id}")
+    EntityModel<Member> getOneMember(@PathVariable Long id) {
+        return EntityModel.of(memberService.getOneMember(id),
+                linkTo(methodOn(MemberController.class).getOneMember(id)).withSelfRel(),
+                linkTo(methodOn(MemberController.class).getAllMembers()).withRel("members"));
     }
 
     /**
-     * Replaces an existing member with new information.
-     * @param newMember The new information for the member.
-     * @param id The ID of the member to replace.
+     * Updates the details of a specific member.
+     *
+     * @param id            The ID of the member to update.
+     * @param updatedMember The updated details of the member.
      * @return The updated member.
      */
-    @PutMapping("/members/{id}")
-    Member replaceMember(@RequestBody Member newMember, @PathVariable Long id) {
-        return repository.findById(id)
-                .map(member -> {
-                    member.setFirst_name(newMember.getFirst_name());
-                    member.setLast_name(newMember.getLast_name());
-                    member.setEmail(newMember.getEmail());
-                    return repository.save(member);
-                })
-                .orElseGet(() -> {
-                    newMember.setId(id);
-                    return repository.save(newMember);
-                });
+    @PutMapping("{id}")
+    ResponseEntity<Member> updateMember(@PathVariable Long id, @Valid @RequestBody Member updatedMember) {
+        Member member = memberService.updateMember(id, updatedMember);
+        return new ResponseEntity<>(member, HttpStatus.OK);
     }
 
     /**
-     * Deletes a member by ID.
+     * Deletes a specific member by ID.
+     *
      * @param id The ID of the member to delete.
+     * @return HTTP status indicating the success of the operation.
      */
-    @DeleteMapping("/members/{id}")
-    void deleteMember(@PathVariable Long id) {
-        repository.deleteById(id);
+    @DeleteMapping("{id}")
+    ResponseEntity<Member> deleteMember(@PathVariable Long id) {
+        memberService.deleteMember(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
