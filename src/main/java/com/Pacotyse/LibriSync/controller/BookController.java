@@ -1,12 +1,13 @@
 package com.Pacotyse.LibriSync.controller;
 
-import com.Pacotyse.LibriSync.exception.DuplicateException;
-import com.Pacotyse.LibriSync.exception.NotFoundException;
 import com.Pacotyse.LibriSync.model.Book;
-import com.Pacotyse.LibriSync.repository.BookRepository;
+import com.Pacotyse.LibriSync.service.BookService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,97 +17,73 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
- * Controller class for handling requests related to books.
+ * Controller class for managing books in the library system.
  */
 @RestController
+@RequestMapping("/books")
 public class BookController {
 
-    private final BookRepository repository;
+    @Autowired
+    private BookService bookService;
 
     /**
-     * Constructs a new BookController with the specified BookRepository.
-     * @param repository The BookRepository to be used.
+     * Adds a new book to the library.
+     * @param newBook The new book to add.
+     * @return The added book.
      */
-    BookController(BookRepository repository) {
-        this.repository = repository;
+    @PostMapping("/add")
+    ResponseEntity<Book> addBook(@Valid @RequestBody Book newBook) {
+        bookService.addBook(newBook);
+        return new ResponseEntity<>(newBook, HttpStatus.CREATED);
     }
 
     /**
-     * Retrieves all books and returns them as a collection model with HATEOAS links.
-     * @return A collection model containing all books with HATEOAS links.
+     * Retrieves all books in the library.
+     * @return A collection of book resources.
      */
-    @GetMapping("/books")
-    CollectionModel<EntityModel<Book>> all() {
-        List<EntityModel<Book>> books = repository.findAll().stream()
+    @GetMapping("")
+    CollectionModel<EntityModel<Book>> getAllBooks() {
+        List<EntityModel<Book>> books = bookService.getAllBooks().stream()
                 .map(book -> EntityModel.of(book,
-                        linkTo(methodOn(BookController.class).one(book.getIsbn())).withSelfRel(),
-                        linkTo(methodOn(BookController.class).all()).withRel("books")))
+                        linkTo(methodOn(BookController.class).getOneBook(book.getIsbn())).withSelfRel(),
+                        linkTo(methodOn(BookController.class).getAllBooks()).withRel("books")))
                 .collect(Collectors.toList());
 
-        return CollectionModel.of(books, linkTo(methodOn(BookController.class).all()).withSelfRel());
+        return CollectionModel.of(books, linkTo(methodOn(BookController.class).getAllBooks()).withSelfRel());
     }
 
     /**
-     * Saves a new book.
-     *
-     * @param newBook The book to be saved. It should be passed in the request body.
-     * @return The saved book.
+     * Retrieves details of a specific book.
+     * @param isbn The ISBN of the book to retrieve.
+     * @return The details of the book.
      */
-    @PostMapping("/books")
-    public Book newBook(@Valid @RequestBody Book newBook) {
-        if (repository.existsById(newBook.getIsbn())) {
-            throw new DuplicateException();
-        } else {
-            return repository.save(newBook);
-        }
+    @GetMapping("/{isbn}")
+    EntityModel<Book> getOneBook(@PathVariable Long isbn) {
+        return EntityModel.of(bookService.getOneBook(isbn),
+                linkTo(methodOn(BookController.class).getOneBook(isbn)).withSelfRel(),
+                linkTo(methodOn(BookController.class).getAllBooks()).withRel("books"));
     }
 
     /**
-     * Retrieves a single book by its id and returns it as an entity model with HATEOAS links.
-     * @param id The id of the book to be retrieved.
-     * @return The book with the specified id as an entity model with HATEOAS links.
-     */
-    @GetMapping("/books/{id}")
-    EntityModel<Book> one(@PathVariable Long id) {
-        Book book = repository.findById(id)
-                .orElseThrow(NotFoundException::new);
-
-        return EntityModel.of(book,
-                linkTo(methodOn(BookController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(BookController.class).all()).withRel("books"));
-
-    }
-
-    /**
-     * Replaces the book with the specified ID with the provided new book details.
-     *
-     * @param newBook The new details of the book.
-     * @param id      The ID of the book to be replaced.
+     * Updates details of a specific book.
+     * @param isbn The ISBN of the book to update.
+     * @param updatedBook The updated details of the book.
      * @return The updated book.
      */
-    @PutMapping("/books/{id}")
-    Book replaceBook(@RequestBody Book newBook, @PathVariable Long id) {
-        return repository.findById(id)
-                .map(book -> {
-                    book.setTitle(newBook.getTitle());
-                    book.setAuthor(newBook.getAuthor());
-                    book.setEditor(newBook.getEditor());
-                    book.setStock(newBook.getStock());
-                    return repository.save(book);
-                })
-                .orElseGet(() -> {
-                    newBook.setIsbn(id);
-                    return repository.save(newBook);
-                });
+    @PutMapping("/{isbn}")
+    ResponseEntity<Book> updateBook(@PathVariable Long isbn, @Valid @RequestBody Book updatedBook) {
+        Book book = bookService.updateBook(isbn, updatedBook);
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     /**
-     * Deletes a book with the specified ID.
-     *
-     * @param id The ID of the book to be deleted.
+     * Deletes a specific book from the library.
+     * @param isbn The ISBN of the book to delete.
+     * @return A response entity indicating the success of the operation.
      */
-    @DeleteMapping("/books/{id}")
-    void deleteBook(@PathVariable Long id) {
-        repository.deleteById(id);
+    @DeleteMapping("/{isbn}")
+    ResponseEntity<Book> deleteBook(@PathVariable Long isbn) {
+        bookService.deleteBook(isbn);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
